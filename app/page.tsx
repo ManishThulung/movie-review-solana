@@ -1,11 +1,13 @@
+import { FoodList } from "@/components/food-list";
+import Form from "@/components/form";
 import Navbar from "@/components/navbar";
-import Transfer from "@/components/transfer";
 
 export default function Home() {
   return (
     <>
       <Navbar />
-      <Transfer />
+      <Form />
+      <FoodList />
     </>
   );
 }
