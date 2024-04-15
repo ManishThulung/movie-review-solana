@@ -33,8 +33,8 @@ export class Food {
 
   static borshAccountSchema = borsh.struct([
     borsh.bool("initialized"),
-    borsh.str("title"),
-    borsh.u8("rating"),
+    borsh.str("rating"),
+    borsh.u8("title"),
     borsh.str("description"),
   ]);
   static deserialize(buffer?: Buffer): Food | null {

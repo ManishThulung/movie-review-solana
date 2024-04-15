@@ -7,14 +7,22 @@ export class FoodCoordinator {
   static accounts: web3.PublicKey[] = [];
 
   static async prefetchAccounts(connection: web3.Connection) {
-    const accounts = await connection.getProgramAccounts(
+    const accounts: any = await connection.getProgramAccounts(
       new web3.PublicKey(FOOD_REVIEW_PROGRAM_ID),
       {
-        dataSlice: { offset: 0, length: 0 },
+        dataSlice: { offset: 2, length: 18 },
       }
     );
 
-    this.accounts = accounts.map((account) => account.pubkey);
+    accounts?.sort((a: any, b: any) => {
+      const lengthA = a.account.data.readUInt32LE(0);
+      const lengthB = b.account.data.readUInt32LE(0);
+      const dataA = a.account.data.slice(4, 4 + lengthA);
+      const dataB = b.account.data.slice(4, 4 + lengthB);
+      return dataA.compare(dataB);
+    });
+
+    this.accounts = accounts.map((account: any) => account.pubkey);
   }
 
   static async fetchPage(
@@ -38,8 +46,6 @@ export class FoodCoordinator {
     const accounts = await connection.getMultipleAccountsInfo(
       paginatedPublicKeys
     );
-
-    console.log(accounts, " from getMultipleAccountsInfo");
 
     // const foods = accounts.reduce((accum: Food[], account) => {
     //   const food = Food.deserialize(account?.data);
