@@ -1,4 +1,5 @@
 import * as web3 from "@solana/web3.js";
+import bs58 from "bs58";
 import { Food } from "./Food";
 
 const FOOD_REVIEW_PROGRAM_ID = "CenYq6bDRB7p73EjsPEpiYN7uveyPUTdXkDkgUduboaN";
@@ -6,11 +7,22 @@ const FOOD_REVIEW_PROGRAM_ID = "CenYq6bDRB7p73EjsPEpiYN7uveyPUTdXkDkgUduboaN";
 export class FoodCoordinator {
   static accounts: web3.PublicKey[] = [];
 
-  static async prefetchAccounts(connection: web3.Connection) {
+  static async prefetchAccounts(connection: web3.Connection, search: string) {
     const accounts: any = await connection.getProgramAccounts(
       new web3.PublicKey(FOOD_REVIEW_PROGRAM_ID),
       {
         dataSlice: { offset: 2, length: 18 },
+        filters:
+          search === ""
+            ? []
+            : [
+                {
+                  memcmp: {
+                    offset: 6,
+                    bytes: bs58.encode(Buffer.from(search)),
+                  },
+                },
+              ],
       }
     );
 
@@ -28,10 +40,12 @@ export class FoodCoordinator {
   static async fetchPage(
     connection: web3.Connection,
     page: number,
-    perPage: number
+    perPage: number,
+    search: string,
+    reload: boolean = false
   ): Promise<Food[] | null> {
-    if (this.accounts.length === 0) {
-      await this.prefetchAccounts(connection);
+    if (this.accounts.length === 0 || reload) {
+      await this.prefetchAccounts(connection, search);
     }
 
     const paginatedPublicKeys = this.accounts.slice(
@@ -47,18 +61,18 @@ export class FoodCoordinator {
       paginatedPublicKeys
     );
 
-    // const foods = accounts.reduce((accum: Food[], account) => {
-    //   const food = Food.deserialize(account?.data);
-    //   if (!food) {
-    //     return accum;
-    //   }
-    //   return [...accum, food];
-    // }, []);
-
-    const foods = accounts.map((account) => {
+    const foods = accounts.reduce((accum: Food[], account) => {
       const food = Food.deserialize(account?.data);
-      return food;
-    });
+      if (!food) {
+        return accum;
+      }
+      return [...accum, food];
+    }, []);
+
+    // const foods = accounts.map((account) => {
+    //   const food = Food.deserialize(account?.data);
+    //   return food;
+    // });
 
     return foods;
   }
