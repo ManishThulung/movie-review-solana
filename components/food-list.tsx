@@ -13,14 +13,13 @@ export const FoodList: FC = () => {
   const [search, setSearch] = useState<string>("");
 
   useEffect(() => {
-    FoodCoordinator.fetchPage(connection, page, 2, search, search !== "").then(
+    FoodCoordinator.fetchPage(connection, page, 5, search, search !== "").then(
       setFoods
     );
   }, [page, search]);
-  console.log(foods, "foods");
 
   return (
-    <div>
+    <div className="w-full">
       <div className="m-auto w-[260px] mt-4">
         <input
           type="text"
@@ -31,9 +30,11 @@ export const FoodList: FC = () => {
           onChange={(e) => setSearch(e?.target?.value)}
         />
       </div>
-      {foods?.map((food, i) => (
-        <Card key={i} food={food} />
-      ))}
+      <div className="px-10 flex gap-5 flex-wrap">
+        {foods?.map((food, i) => (
+            <Card key={i} food={food} />
+        ))}
+      </div>
 
       <div className="flex w-[200px] mt-1 mb-2 mx-4 bg-slate-500">
         {page > 1 && (

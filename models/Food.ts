@@ -7,22 +7,15 @@ export class Food {
 
   constructor(title: string, rating: number, description: string) {
     this.title = title;
-    this.rating = rating;
     this.description = description;
+    this.rating = rating;
   }
-
-  static mocks: Food[] = [
-    new Food("Burger", 5, "It is good"),
-    new Food("Chowmin", 5, "It was the best"),
-    new Food("Sandwitch", 5, "It is testy"),
-    new Food("Mo:Mo", 5, "It is was delecious"),
-  ];
 
   borshInstructionSchema = borsh.struct([
     borsh.u8("variant"),
     borsh.str("title"),
-    borsh.u8("rating"),
     borsh.str("description"),
+    borsh.u8("rating"),
   ]);
 
   serialize(): Buffer {
@@ -33,16 +26,17 @@ export class Food {
 
   static borshAccountSchema = borsh.struct([
     borsh.bool("initialized"),
-    borsh.str("rating"),
-    borsh.u8("title"),
+    borsh.str("title"),
     borsh.str("description"),
+    borsh.u8("rating"),
   ]);
+
   static deserialize(buffer?: Buffer): Food | null {
     if (!buffer) {
       return null;
     }
     try {
-      const { title, rating, description } =
+      const { title, description, rating } =
         this.borshAccountSchema.decode(buffer);
       return new Food(title, rating, description);
     } catch (error) {

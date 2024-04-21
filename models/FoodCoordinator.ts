@@ -2,7 +2,7 @@ import * as web3 from "@solana/web3.js";
 import bs58 from "bs58";
 import { Food } from "./Food";
 
-const FOOD_REVIEW_PROGRAM_ID = "CenYq6bDRB7p73EjsPEpiYN7uveyPUTdXkDkgUduboaN";
+const FOOD_REVIEW_PROGRAM_ID = "GnSufddBLUPm63wcbdsifPPoyKges73VYtbgh1s4eJAY";
 
 export class FoodCoordinator {
   static accounts: web3.PublicKey[] = [];
@@ -11,14 +11,17 @@ export class FoodCoordinator {
     const accounts: any = await connection.getProgramAccounts(
       new web3.PublicKey(FOOD_REVIEW_PROGRAM_ID),
       {
-        dataSlice: { offset: 2, length: 18 },
+        // 1 -> to sort data by title, initialized takes 1 byte and title comes second
+        // 18 -> the length of title is dynamic so assuming 18 bytes is enough for title
+        dataSlice: { offset: 1, length: 18 },
         filters:
           search === ""
             ? []
             : [
                 {
                   memcmp: {
-                    offset: 6,
+                    //  The offset to the title fields is 1, but the first 4 bytes are the length of the title so the actual offset to the string itself is 5
+                    offset: 5,
                     bytes: bs58.encode(Buffer.from(search)),
                   },
                 },
@@ -60,6 +63,8 @@ export class FoodCoordinator {
     const accounts = await connection.getMultipleAccountsInfo(
       paginatedPublicKeys
     );
+
+    console.log(accounts, "getMultipleAccounts");
 
     const foods = accounts.reduce((accum: Food[], account) => {
       const food = Food.deserialize(account?.data);
