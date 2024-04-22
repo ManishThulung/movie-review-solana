@@ -1,19 +1,19 @@
 import * as web3 from "@solana/web3.js";
 import bs58 from "bs58";
-import { Food } from "./Food";
+import { Movie } from "./Movie";
 
-const FOOD_REVIEW_PROGRAM_ID = "GnSufddBLUPm63wcbdsifPPoyKges73VYtbgh1s4eJAY";
+const MOVIE_REVIEW_PROGRAM_ID = "Bq4we4RcyXUxEFkqwXp2UKqCggHcDXBfBU6gdwNxuow8";
 
-export class FoodCoordinator {
+export class MovieCoordinator {
   static accounts: web3.PublicKey[] = [];
 
   static async prefetchAccounts(connection: web3.Connection, search: string) {
     const accounts: any = await connection.getProgramAccounts(
-      new web3.PublicKey(FOOD_REVIEW_PROGRAM_ID),
+      new web3.PublicKey(MOVIE_REVIEW_PROGRAM_ID),
       {
         // 1 -> to sort data by title, initialized takes 1 byte and title comes second
         // 18 -> the length of title is dynamic so assuming 18 bytes is enough for title
-        dataSlice: { offset: 1, length: 18 },
+        dataSlice: { offset: 2, length: 18 },
         filters:
           search === ""
             ? []
@@ -21,7 +21,7 @@ export class FoodCoordinator {
                 {
                   memcmp: {
                     //  The offset to the title fields is 1, but the first 4 bytes are the length of the title so the actual offset to the string itself is 5
-                    offset: 5,
+                    offset: 6,
                     bytes: bs58.encode(Buffer.from(search)),
                   },
                 },
@@ -46,7 +46,7 @@ export class FoodCoordinator {
     perPage: number,
     search: string,
     reload: boolean = false
-  ): Promise<Food[] | null> {
+  ): Promise<Movie[] | null> {
     if (this.accounts.length === 0 || reload) {
       await this.prefetchAccounts(connection, search);
     }
@@ -66,19 +66,19 @@ export class FoodCoordinator {
 
     console.log(accounts, "getMultipleAccounts");
 
-    const foods = accounts.reduce((accum: Food[], account) => {
-      const food = Food.deserialize(account?.data);
-      if (!food) {
+    const movies = accounts.reduce((accum: Movie[], account) => {
+      const movie = Movie.deserialize(account?.data);
+      if (!movie) {
         return accum;
       }
-      return [...accum, food];
+      return [...accum, movie];
     }, []);
 
-    // const foods = accounts.map((account) => {
-    //   const food = Food.deserialize(account?.data);
-    //   return food;
+    // const movies = accounts.map((account) => {
+    //   const movie = movie.deserialize(account?.data);
+    //   return movie;
     // });
 
-    return foods;
+    return movies;
   }
 }

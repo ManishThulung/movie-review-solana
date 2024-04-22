@@ -1,20 +1,20 @@
 "use client";
 
-import { Food } from "@/models/Food";
+import { Movie } from "@/models/Movie";
 import { FC, useEffect, useState } from "react";
 import { Card } from "./card";
 import { useConnection } from "@solana/wallet-adapter-react";
-import { FoodCoordinator } from "@/models/FoodCoordinator";
+import { MovieCoordinator } from "@/models/MovieCoordinator";
 
-export const FoodList: FC = () => {
+export const MovieList: FC = () => {
   const { connection } = useConnection();
-  const [foods, setFoods] = useState<Food[] | null>([]);
+  const [movies, setMovies] = useState<Movie[] | null>([]);
   const [page, setPage] = useState<number>(1);
   const [search, setSearch] = useState<string>("");
 
   useEffect(() => {
-    FoodCoordinator.fetchPage(connection, page, 5, search, search !== "").then(
-      setFoods
+    MovieCoordinator.fetchPage(connection, page, 5, search, search !== "").then(
+      setMovies
     );
   }, [page, search]);
 
@@ -31,8 +31,8 @@ export const FoodList: FC = () => {
         />
       </div>
       <div className="px-10 flex gap-5 flex-wrap">
-        {foods?.map((food, i) => (
-            <Card key={i} food={food} />
+        {movies?.map((movie, i) => (
+          <Card key={i} movie={movie} />
         ))}
       </div>
 
@@ -42,7 +42,7 @@ export const FoodList: FC = () => {
             Previous
           </button>
         )}
-        {FoodCoordinator.accounts.length > page * 5 && (
+        {MovieCoordinator.accounts.length > page * 5 && (
           <button onClick={() => setPage(page + 1)}>Next</button>
         )}
       </div>

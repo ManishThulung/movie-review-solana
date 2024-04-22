@@ -1,10 +1,10 @@
 "use client";
-import { Food } from "@/models/Food";
+import { Movie } from "@/models/Movie";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import * as web3 from "@solana/web3.js";
 import { FC, useState } from "react";
 
-const FOOD_REVIEW_PROGRAM_ID = "GnSufddBLUPm63wcbdsifPPoyKges73VYtbgh1s4eJAY";
+const MOVIE_REVIEW_PROGRAM_ID = "Bq4we4RcyXUxEFkqwXp2UKqCggHcDXBfBU6gdwNxuow8";
 
 const Form: FC = () => {
   const { connection } = useConnection();
@@ -16,21 +16,21 @@ const Form: FC = () => {
   const [description, setDescription] = useState<string>("");
 
   const onClick = () => {
-    const food = new Food(title, rating, description);
-    handleTransactionSubmit(food);
+    const movie = new Movie(title, rating, description);
+    handleTransactionSubmit(movie);
   };
 
-  const handleTransactionSubmit = async (food: Food) => {
+  const handleTransactionSubmit = async (movie: Movie) => {
     if (!connection || !publicKey) {
       return;
     }
 
-    const buffer = food.serialize();
+    const buffer = movie.serialize();
 
     // generating a key to store the data
     const [pda] = await web3.PublicKey.findProgramAddress(
-      [publicKey.toBuffer(), new TextEncoder().encode(food.title)],
-      new web3.PublicKey(FOOD_REVIEW_PROGRAM_ID)
+      [publicKey.toBuffer(), new TextEncoder().encode(movie.title)],
+      new web3.PublicKey(MOVIE_REVIEW_PROGRAM_ID)
     );
 
     const instruction = new web3.TransactionInstruction({
@@ -52,7 +52,7 @@ const Form: FC = () => {
         },
       ],
       data: buffer,
-      programId: new web3.PublicKey(FOOD_REVIEW_PROGRAM_ID),
+      programId: new web3.PublicKey(MOVIE_REVIEW_PROGRAM_ID),
     });
 
     transaction.add(instruction);
@@ -79,7 +79,7 @@ const Form: FC = () => {
     <div className="flex justify-center flex-col mt-4 w-[500px] m-auto gap-8">
       <div>
         <div className="flex justify-center gap-1 flex-col mb-4">
-          <label htmlFor="title">Food name:</label>
+          <label htmlFor="title">Movie name:</label>
           <input
             className="border outline-none border-slate-500 rounded"
             placeholder="Pizza"

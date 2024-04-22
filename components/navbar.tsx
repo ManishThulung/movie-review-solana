@@ -13,7 +13,7 @@ const Navbar: FC = () => {
         width={200}
         className="text-white"
       />
-      <h3 className="text-white">Food - Review</h3>
+      <h3 className="text-white">Movie - Review</h3>
       <WalletMultiButton />
     </div>
   );

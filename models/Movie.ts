@@ -1,6 +1,6 @@
 import * as borsh from "@project-serum/borsh";
 
-export class Food {
+export class Movie {
   title: string;
   rating: number;
   description: string;
@@ -14,8 +14,8 @@ export class Food {
   borshInstructionSchema = borsh.struct([
     borsh.u8("variant"),
     borsh.str("title"),
-    borsh.str("description"),
     borsh.u8("rating"),
+    borsh.str("description"),
   ]);
 
   serialize(): Buffer {
@@ -26,19 +26,19 @@ export class Food {
 
   static borshAccountSchema = borsh.struct([
     borsh.bool("initialized"),
+    borsh.u8("rating"),
     borsh.str("title"),
     borsh.str("description"),
-    borsh.u8("rating"),
   ]);
 
-  static deserialize(buffer?: Buffer): Food | null {
+  static deserialize(buffer?: Buffer): Movie | null {
     if (!buffer) {
       return null;
     }
     try {
       const { title, description, rating } =
         this.borshAccountSchema.decode(buffer);
-      return new Food(title, rating, description);
+      return new Movie(title, rating, description);
     } catch (error) {
       console.log("Deserialization error:", error);
       return null;
